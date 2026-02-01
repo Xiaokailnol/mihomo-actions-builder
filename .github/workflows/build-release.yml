@@ -106,7 +106,7 @@ jobs:
         fpm -s dir -t deb \
           -n mihomo \
           -v "$VERSION" \
-          -p "output/mihomo_${VERSION}_${{ matrix.arch }}.deb" \
+          -p "output/mihomo-linux-${VERSION}-${{ matrix.arch }}.deb" \
           --architecture ${{ matrix.arch }} \
           output/mihomo=/usr/bin/mihomo
         curl -Lo '/tmp/debsigs.diff' 'https://gitlab.com/debsigs/debsigs/-/commit/160138f5de1ec110376d3c807b60a37388bc7c90.diff'
@@ -126,7 +126,7 @@ jobs:
         fpm -s dir -t rpm \
           -n mihomo \
           -v "$VERSION" \
-          -p "output/mihomo_${VERSION}_${{ matrix.arch }}.rpm" \
+          -p "output/mihomo-linux-${VERSION}-${{ matrix.arch }}.rpm" \
           --architecture ${{ matrix.arch }} \
           output/mihomo=/usr/bin/mihomo
         cat > $HOME/.rpmmacros <<EOF
@@ -147,7 +147,7 @@ jobs:
         fpm -s dir -t pacman \
           -n mihomo \
           -v "$VERSION" \
-          -p "output/mihomo-${VERSION}-${{ matrix.arch }}.pkg.tar.zst" \
+          -p "output/mihomo-linux-${VERSION}-${{ matrix.arch }}.pkg.tar.zst" \
           --architecture ${{ matrix.arch }} \
           output/mihomo=/usr/bin/mihomo
         echo "status=success" >> ${GITHUB_OUTPUT}
