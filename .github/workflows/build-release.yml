@@ -109,10 +109,13 @@ jobs:
           -p "output/mihomo_${VERSION}_${{ matrix.arch }}.deb" \
           --architecture ${{ matrix.arch }} \
           output/mihomo=/usr/bin/mihomo
+        curl -Lo '/tmp/debsigs.diff' 'https://gitlab.com/debsigs/debsigs/-/commit/160138f5de1ec110376d3c807b60a37388bc7c90.diff'
+        sudo patch /usr/bin/debsigs < '/tmp/debsigs.diff'
         rm -rf $HOME/.gnupg
         gpg --pinentry-mode loopback --passphrase "${{ secrets.GPG_PASSPHRASE }}" --import <<EOF
         ${{ secrets.GPG_KEY }}
         EOF
+        debsigs --sign=origin -k ${{ secrets.GPG_KEY_ID }} --gpgopts '--pinentry-mode loopback --passphrase "${{ secrets.GPG_PASSPHRASE }}"' output/*.deb
         echo "status=success" >> ${GITHUB_OUTPUT}
 
     - name: Package RPM
@@ -126,6 +129,14 @@ jobs:
           -p "output/mihomo_${VERSION}_${{ matrix.arch }}.rpm" \
           --architecture ${{ matrix.arch }} \
           output/mihomo=/usr/bin/mihomo
+        cat > $HOME/.rpmmacros <<EOF
+        %_gpg_name ${{ secrets.GPG_KEY_ID }}
+        %_gpg_sign_cmd_extra_args --pinentry-mode loopback --passphrase ${{ secrets.GPG_PASSPHRASE }}
+        EOF
+        gpg --pinentry-mode loopback --passphrase "${{ secrets.GPG_PASSPHRASE }}" --import <<EOF
+        ${{ secrets.GPG_KEY }}
+        EOF
+        rpmsign --addsign output/*.rpm
         echo "status=success" >> ${GITHUB_OUTPUT}
 
     - name: Package Pacman
@@ -143,7 +154,7 @@ jobs:
     - name: Upload artifacts
       uses: actions/upload-artifact@v4
       with:
-        name: mihomo_v${{ env.VERSION }}_${{ matrix.arch }}
+        name: mihomo_${{ env.VERSION }}_${{ matrix.arch }}
         path: ${{ env.build_dir }}/mihomo/output/*
 
     - name: Create release
