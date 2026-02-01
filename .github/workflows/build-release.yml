@@ -23,7 +23,7 @@ jobs:
         arch:
           - amd64
           - arm64
-#          - metacubexd
+          - metacubexd
 
     steps:
     - name: Checkout
@@ -80,6 +80,7 @@ jobs:
         echo "status=success" >> ${GITHUB_OUTPUT}
 
     - name: Compile Packages
+      if: ${{ matrix.arch != 'metacubexd' }}
       id: compile
       working-directory: /builder
       run: |
@@ -92,6 +93,7 @@ jobs:
         echo "status=success" >> ${GITHUB_OUTPUT}
 
     - name: Packages DEB
+      if: ${{ matrix.arch != 'metacubexd' }}
       id: deb
       working-directory: /builder
       run: |
@@ -112,6 +114,7 @@ jobs:
         echo "status=success" >> ${GITHUB_OUTPUT}
 
     - name: Package RPM
+      if: ${{ matrix.arch != 'metacubexd' }}
       id: rpm
       working-directory: /builder
       run: |
@@ -133,6 +136,7 @@ jobs:
         echo "status=success" >> ${GITHUB_OUTPUT}
 
     - name: Package Pacman
+      if: ${{ matrix.arch != 'metacubexd' }}
       id: pacman
       working-directory: /builder
       run: |
@@ -145,13 +149,25 @@ jobs:
           output/mihomo=/usr/bin/mihomo
         echo "status=success" >> ${GITHUB_OUTPUT}
 
+    - name: Compile Metacubexd
+      if: ${{ matrix.arch == 'metacubexd' }}
+      id: metacubexd
+      working-directory: /builder    
+      run: |
+        cd metacubexd
+        pnpm install
+        pnpm generate
+        pnpm preview
+      
     - name: Upload artifacts
+      if: ${{ matrix.arch != 'metacubexd' }}
       uses: actions/upload-artifact@v4
       with:
         name: mihomo_${{ env.VERSION }}_${{ matrix.arch }}
         path: ${{ env.build_dir }}/mihomo/output/*
 
     - name: Create release
+      if: ${{ matrix.arch != 'metacubexd' }}
       uses: ncipollo/release-action@v1
       with:
         name: v${{ env.VERSION }}
