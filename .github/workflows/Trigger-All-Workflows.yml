@@ -35,27 +35,42 @@ jobs:
     uses: ./.github/workflows/Mihomo-Linux-AMD64.yml
     with:
       VERSION: ${{ needs.setup.outputs.VERSION }}
-
+      MIHOMO_URL: https://github.com/MetaCubeX/mihomo
+      MIHOMO_BRANCH: Alpha
+      BUILD_TAGS: -extldflags --static
+      
   Mihomo-Linux-ARM64:
     needs: setup
     uses: ./.github/workflows/Mihomo-Linux-ARM64.yml
     with:
       VERSION: ${{ needs.setup.outputs.VERSION }}
+      MIHOMO_URL: https://github.com/MetaCubeX/mihomo
+      MIHOMO_BRANCH: Alpha
+      BUILD_TAGS: -extldflags --static
 
   Mihomo-Windows-AMD64:
     needs: setup
     uses: ./.github/workflows/Mihomo-Windows-AMD64.yml
     with:
       VERSION: ${{ needs.setup.outputs.VERSION }}
+      MIHOMO_URL: https://github.com/MetaCubeX/mihomo
+      MIHOMO_BRANCH: Alpha
+      BUILD_TAGS: -extldflags --static
 
   Mihomo-Windows-ARM64:
     needs: setup
     uses: ./.github/workflows/Mihomo-Windows-ARM64.yml
     with:
       VERSION: ${{ needs.setup.outputs.VERSION }}
+      MIHOMO_URL: https://github.com/MetaCubeX/mihomo
+      MIHOMO_BRANCH: Alpha
+      BUILD_TAGS: -extldflags --static
 
   Mihomo-Metacubexd:
     needs: setup
     uses: ./.github/workflows/Mihomo-Metacubexd.yml
     with:
       VERSION: ${{ needs.setup.outputs.VERSION }}
+      METACUBEXD_URL: https://github.com/MetaCubeX/metacubexd
+      METACUBEXD_BRANCH: main
+      BUILD_TAGS: -extldflags --static
