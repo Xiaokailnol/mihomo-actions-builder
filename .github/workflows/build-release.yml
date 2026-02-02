@@ -166,7 +166,7 @@ jobs:
 
     - name: Update Metacubexd version File
       if: ${{ matrix.arch == 'metacubexd' }}
-      working-directory: /builder
+      working-directory: ${{ github.workspace }}
       id: file
       run: |
         git config user.name "github-actions"
@@ -174,7 +174,7 @@ jobs:
         for file in template/MihomoPro.yaml template/OneSmart.yaml template/OneSmartPro.yaml template/OneTouch.yaml; do
             sed -i "s|^external-ui-url: .*|external-ui-url: https://github.com/Xiaokailnol/mihomo-template/releases/download/v$VERSION/compressed-dist.tgz|" "$file"
         done
-        git add .
+        git add template/*.yaml
         git commit -m "Metacubexd: bump to $VERSION"
         git push
           
