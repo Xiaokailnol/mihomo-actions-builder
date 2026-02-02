@@ -162,8 +162,8 @@ jobs:
       run: |
         cd metacubexd
         pnpm install
-        pnpm generate
-        pnpm preview
+        NUXT_APP_BASE_URL='./' pnpm generate
+        tar czvf compressed-dist.tgz -C .output/public .
       
     - name: Upload mihomo artifacts
       if: ${{ matrix.arch != 'metacubexd' }}
