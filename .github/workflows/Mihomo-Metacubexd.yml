@@ -12,12 +12,16 @@ on:
       METACUBEXD_BRANCH:
         required: true
         type: string
-
+      BUILD_DIR:
+        required: true
+        type: string
+        
 env:
   VERSION: ${{inputs.VERSION}}
   METACUBEXD_URL: ${{inputs.METACUBEXD_URL}}
   METACUBEXD_BRANCH: ${{inputs.METACUBEXD_BRANCH}}
-
+  BUILD_DIR: ${{inputs.BUILD_DIR}} 
+  
 jobs:
   setup:
     runs-on: ubuntu-24.04
