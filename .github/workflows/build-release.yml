@@ -107,7 +107,7 @@ jobs:
         echo "status=success" >> ${GITHUB_OUTPUT}
 
     - name: Packages DEB
-      if: ${{ matrix.arch != 'metacubexd' && matrix.arch != 'windowst' }}
+      if: ${{ matrix.arch != 'metacubexd' && matrix.arch != 'windows' }}
       id: deb
       working-directory: /builder
       run: |
@@ -128,7 +128,7 @@ jobs:
         echo "status=success" >> ${GITHUB_OUTPUT}
 
     - name: Package RPM
-      if: ${{ matrix.arch != 'metacubexd' && matrix.arch != 'windowst' }}
+      if: ${{ matrix.arch != 'metacubexd' && matrix.arch != 'windows' }}
       id: rpm
       working-directory: /builder
       run: |
@@ -150,7 +150,7 @@ jobs:
         echo "status=success" >> ${GITHUB_OUTPUT}
 
     - name: Package Pacman
-      if: ${{ matrix.arch != 'metacubexd' && matrix.arch != 'windowst' }}
+      if: ${{ matrix.arch != 'metacubexd' && matrix.arch != 'windows' }}
       id: pacman
       working-directory: /builder
       run: |
