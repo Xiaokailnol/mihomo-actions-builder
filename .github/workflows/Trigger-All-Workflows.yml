@@ -80,7 +80,7 @@ jobs:
       METACUBEXD_BRANCH: main
       BUILD_DIR: /builder
 
-  sync_rules:
+  sync_template:
     needs:
       - Mihomo-Linux-AMD64
       - Mihomo-Linux-ARM64
