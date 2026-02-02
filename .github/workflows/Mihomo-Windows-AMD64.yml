@@ -1,0 +1,82 @@
+name: Mihomo Windows AMD64
+
+on:
+  workflow_call:
+    inputs:
+      VERSION:
+        required: true
+        type: string
+      MIHOMO_URL:
+        required: true
+        type: string
+      MIHOMO_BRANCH:
+        required: true
+        type: string
+      BUILD_TAGS:
+        required: true
+        type: string
+
+env:
+  VERSION: ${{inputs.VERSION}}
+  MIHOMO_URL: ${{inputs.MIHOMO_URL}}
+  MIHOMO_BRANCH: ${{inputs.MIHOMO_BRANCH}}
+  BUILD_TAGS: ${{inputs.BUILD_TAGS}}
+  
+jobs:
+  setup:
+    runs-on: ubuntu-24.04
+    defaults:
+      run:
+        shell: bash
+    strategy:
+      fail-fast: false
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v6
+
+    - name: Show system info
+      uses: Xiaokailnol/actions@show-system
+
+    - name: Free disk space
+      uses: Xiaokailnol/actions@free-disk
+      with:
+        build-mount-path: /builder
+
+    - name: Build System Setup
+      uses: Xiaokailnol/actions@mihomo-build-setup
+
+    - name: Clone Source Code
+      working-directory: /builder
+      id: clone
+      run: |
+        git clone $MIHOMO_URL -b $MIHOMO_BRANCH mihomo
+        echo "BUILDTIME=$(date)" >> $GITHUB_ENV
+
+    - name: Compile Packages
+      id: compile
+      working-directory: /builder
+      run: |
+        cd mihomo
+        go env
+        GOOS=windows GOARCH=amd64 go build -v -tags "with_gvisor" -trimpath -ldflags "${BUILDTAG} -X 'github.com/metacubex/mihomo/constant.Version=${VERSION}' -X 'github.com/metacubex/mihomo/constant.BuildTime=${BUILDTIME}' -w -s -buildid="
+        cp mihomo.exe mihomo-windows-$VERSION-amd64.exe
+        zip -r mihomo-windows-$VERSION-amd64.zip mihomo-windows-$VERSION-amd64.exe
+
+    - name: Upload mihomo artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: mihomo_${{ env.VERSION }}_${{ matrix.arch }}
+        path: ${{ env.build_dir }}/mihomo/*.zip
+
+    - name: Create mihomo release
+      uses: ncipollo/release-action@v1
+      with:
+        name: v${{ env.VERSION }}
+        tag: v${{ env.VERSION }}
+        commit: master
+        allowUpdates: true
+        replacesArtifacts: true
+        token: ${{ secrets.GITHUB_TOKEN }}
+        artifacts: |
+          ${{ env.build_dir }}/mihomo/*.zip
