@@ -165,21 +165,21 @@ jobs:
         pnpm generate
         pnpm preview
       
-    - name: Upload artifacts
+    - name: Upload mihomo artifacts
       if: ${{ matrix.arch != 'metacubexd' }}
       uses: actions/upload-artifact@v4
       with:
         name: mihomo_${{ env.VERSION }}_${{ matrix.arch }}
         path: ${{ env.build_dir }}/mihomo/output/*
 
-    - name: Upload artifacts
+    - name: Upload metacubexd artifacts
       if: ${{ matrix.arch == 'metacubexd' }}
       uses: actions/upload-artifact@v4
       with:
         name: mihomo_${{ env.VERSION }}_${{ matrix.arch }}
         path: ${{ env.build_dir }}/metacubexd/compressed-dist.tgz
 
-    - name: Create release
+    - name: Create metacubexd release
       if: ${{ matrix.arch == 'metacubexd' }}
       uses: ncipollo/release-action@v1
       with:
@@ -192,7 +192,7 @@ jobs:
         artifacts: |
           ${{ env.build_dir }}/metacubexd/compressed-dist.tgz
           
-    - name: Create release
+    - name: Create mihomo release
       if: ${{ matrix.arch != 'metacubexd' }}
       uses: ncipollo/release-action@v1
       with:
