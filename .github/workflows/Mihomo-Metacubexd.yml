@@ -66,7 +66,7 @@ jobs:
       uses: actions/upload-artifact@v4
       with:
         name: mihomo_metacubexd_${{ env.VERSION }}
-        path: ${{ env.build_dir }}/metacubexd/compressed-dist.tgz
+        path: ${{ env.BUILD_DIR }}/metacubexd/compressed-dist.tgz
 
     - name: Create metacubexd release
       uses: ncipollo/release-action@v1
@@ -78,4 +78,4 @@ jobs:
         replacesArtifacts: true
         token: ${{ secrets.GITHUB_TOKEN }}
         artifacts: |
-          ${{ env.build_dir }}/metacubexd/compressed-dist.tgz
+          ${{ env.BUILD_DIR }}/metacubexd/compressed-dist.tgz
