@@ -75,7 +75,7 @@ jobs:
           -v "$VERSION" \
           -p "output/mihomo-linux-${VERSION}-amd64.deb" \
           --architecture amd64 \
-          mihomo=/usr/bin/mihomo
+          output/mihomo=/usr/bin/mihomo
 
     - name: Package RPM
       id: rpm
@@ -87,7 +87,7 @@ jobs:
           -v "$VERSION" \
           -p "output/mihomo-linux-${VERSION}-amd64-${VERSION}.rpm" \
           --architecture x86_64 \
-          mihomo=/usr/bin/mihomo
+          output/mihomo=/usr/bin/mihomo
 
     - name: Package Pacman
       id: pacman
@@ -95,11 +95,11 @@ jobs:
       run: |
         cd mihomo
         fpm -s dir -t pacman \
-          -n mihomo \        
+          -n mihomo \
           -v "$VERSION" \
           -p "output/mihomo-linux-${VERSION}-amd64-${VERSION}.pkg.tar.zst" \
           --architecture x86_64 \
-          mihomo=/usr/bin/mihomo
+          output/mihomo=/usr/bin/mihomo
 
     - name: Upload mihomo artifacts
       uses: actions/upload-artifact@v4
