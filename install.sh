@@ -1,92 +1,130 @@
 #!/bin/sh
+set -e
 
-download_beta=false
-download_version=""
+# ======================
+# 基础信息
+# ======================
+REPO_OWNER="Xiaokailnol"
+REPO_NAME="mihomo-template"
+BIN_NAME="mihomo"
+
+API_LATEST="https://api.github.com/repos/${REPO_OWNER}/${REPO_NAME}/releases/latest"
+DOWNLOAD_BASE="https://github.com/${REPO_OWNER}/${REPO_NAME}/releases/download"
+
+# ======================
+# 日志工具
+# ======================
+info()  { printf "\033[1;34m[INFO]\033[0m %s\n" "$*"; }
+warn()  { printf "\033[1;33m[WARN]\033[0m %s\n" "$*"; }
+error() { printf "\033[1;31m[ERROR]\033[0m %s\n" "$*"; exit 1; }
+
+# ======================
+# 参数解析
+# ======================
+DOWNLOAD_VERSION=""
 
 while [ $# -gt 0 ]; do
   case "$1" in
-    --beta)
-      download_beta=true
-      shift
-      ;;
     --version)
       shift
-      [ $# -eq 0 ] && echo "Missing argument for --version" && exit 1
-      download_version="$1"
+      [ -z "$1" ] && error "Missing argument for --version"
+      DOWNLOAD_VERSION="$1"
       shift
       ;;
+    -h|--help)
+      echo "Usage: $0 [--version <version>]"
+      exit 0
+      ;;
     *)
-      echo "Usage: $0 [--beta] [--version <version>]"
-      exit 1
+      error "Unknown argument: $1"
       ;;
   esac
 done
 
-# ---------- 系统检测 ----------
-if command -v pacman >/dev/null 2>&1; then
-  os="linux"
-  arch=$(uname -m)
-  package_suffix=".pkg.tar.zst"
-  package_install="pacman -U --noconfirm"
-elif command -v dpkg >/dev/null 2>&1; then
-  os="linux"
-  arch=$(dpkg --print-architecture)
-  package_suffix=".deb"
-  package_install="dpkg -i"
-elif command -v dnf >/dev/null 2>&1; then
-  os="linux"
-  arch=$(uname -m)
-  package_suffix=".rpm"
-  package_install="dnf install -y"
-elif command -v rpm >/dev/null 2>&1; then
-  os="linux"
-  arch=$(uname -m)
-  package_suffix=".rpm"
-  package_install="rpm -i"
-else
-  echo "Unsupported package manager"
-  exit 1
-fi
-
-# ---------- 架构映射（关键） ----------
-case "$arch" in
-  x86_64|amd64) arch="amd64" ;;
-  aarch64|arm64) arch="arm64" ;;
-esac
-
-# ---------- 获取版本 ----------
-if [ -z "$download_version" ]; then
-  API_URL="https://api.github.com/repos/Xiaokailnol/mihomo-template/releases/latest"
-  if [ -n "$GITHUB_TOKEN" ]; then
-    latest_release=$(curl -s -H "Authorization: token ${GITHUB_TOKEN}" "$API_URL")
+# ======================
+# 系统检测
+# ======================
+detect_platform() {
+  if command -v dpkg >/dev/null 2>&1; then
+    PKG_SUFFIX=".deb"
+    PKG_INSTALL="dpkg -i"
+    ARCH="$(dpkg --print-architecture)"
+  elif command -v dnf >/dev/null 2>&1; then
+    PKG_SUFFIX=".rpm"
+    PKG_INSTALL="dnf install -y"
+    ARCH="$(uname -m)"
+  elif command -v rpm >/dev/null 2>&1; then
+    PKG_SUFFIX=".rpm"
+    PKG_INSTALL="rpm -i"
+    ARCH="$(uname -m)"
   else
-    latest_release=$(curl -s "$API_URL")
+    error "Unsupported system: no dpkg / rpm / dnf found"
   fi
 
-  download_version=$(echo "$latest_release" \
-    | grep '"tag_name"' \
-    | head -n 1 \
-    | sed -E 's/.*"v?([^"]+)".*/\1/')
-fi
+  case "$ARCH" in
+    x86_64|amd64) ARCH="amd64" ;;
+    aarch64|arm64) ARCH="arm64" ;;
+  esac
 
-# ---------- 生成包名 ----------
-package_name="mihomo-${os}-${download_version}-${arch}${package_suffix}"
+  OS="linux"
+}
 
-package_url="https://github.com/Xiaokailnol/mihomo-template/releases/download/v${download_version}/${package_name}"
+# ======================
+# 获取最新版本
+# ======================
+fetch_latest_version() {
+  info "Fetching latest release version from GitHub…"
 
-echo "Downloading: $package_url"
+  if [ -n "$GITHUB_TOKEN" ]; then
+    RESP="$(curl -s -H "Authorization: token ${GITHUB_TOKEN}" "$API_LATEST")"
+  else
+    RESP="$(curl -s "$API_LATEST")"
+  fi
 
-if [ -n "$GITHUB_TOKEN" ]; then
-  curl --fail -Lo "$package_name" -H "Authorization: token ${GITHUB_TOKEN}" "$package_url"
-else
-  curl --fail -Lo "$package_name" "$package_url"
-fi
+  VERSION="$(echo "$RESP" \
+    | sed -n 's/.*"tag_name"[[:space:]]*:[[:space:]]*"v\?\([^"]*\)".*/\1/p')"
 
-[ $? -ne 0 ] && exit 1
+  [ -z "$VERSION" ] && {
+    echo "$RESP"
+    error "Failed to parse tag_name from GitHub API"
+  }
 
-# ---------- 安装 ----------
-command -v sudo >/dev/null 2>&1 && package_install="sudo $package_install"
+  echo "$VERSION"
+}
 
-sh -c "$package_install \"$package_name\""
+# ======================
+# 主流程
+# ======================
+main() {
+  detect_platform
 
-rm -f "$package_name"
+  if [ -z "$DOWNLOAD_VERSION" ]; then
+    DOWNLOAD_VERSION="$(fetch_latest_version)"
+  fi
+
+  info "Version   : $DOWNLOAD_VERSION"
+  info "Platform  : $OS"
+  info "Arch      : $ARCH"
+
+  PKG_NAME="${BIN_NAME}-${OS}-${DOWNLOAD_VERSION}-${ARCH}${PKG_SUFFIX}"
+  PKG_URL="${DOWNLOAD_BASE}/v${DOWNLOAD_VERSION}/${PKG_NAME}"
+
+  info "Downloading:"
+  info "  $PKG_URL"
+
+  curl --fail -L -o "$PKG_NAME" "$PKG_URL" || error "Download failed"
+
+  if command -v sudo >/dev/null 2>&1; then
+    PKG_INSTALL="sudo $PKG_INSTALL"
+  fi
+
+  info "Installing package…"
+  sh -c "$PKG_INSTALL \"$PKG_NAME\""
+
+  info "Cleaning up…"
+  rm -f "$PKG_NAME"
+
+  info "✅ mihomo installed successfully"
+}
+
+main
