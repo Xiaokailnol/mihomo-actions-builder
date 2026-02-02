@@ -172,6 +172,26 @@ jobs:
         name: mihomo_${{ env.VERSION }}_${{ matrix.arch }}
         path: ${{ env.build_dir }}/mihomo/output/*
 
+    - name: Upload artifacts
+      if: ${{ matrix.arch == 'metacubexd' }}
+      uses: actions/upload-artifact@v4
+      with:
+        name: mihomo_${{ env.VERSION }}_${{ matrix.arch }}
+        path: ${{ env.build_dir }}/metacubexd/compressed-dist.tgz
+
+    - name: Create release
+      if: ${{ matrix.arch == 'metacubexd' }}
+      uses: ncipollo/release-action@v1
+      with:
+        name: v${{ env.VERSION }}
+        tag: v${{ env.VERSION }}
+        commit: master
+        allowUpdates: true
+        replacesArtifacts: true
+        token: ${{ secrets.GITHUB_TOKEN }}
+        artifacts: |
+          ${{ env.build_dir }}/metacubexd/compressed-dist.tgz
+          
     - name: Create release
       if: ${{ matrix.arch != 'metacubexd' }}
       uses: ncipollo/release-action@v1
