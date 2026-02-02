@@ -32,30 +32,30 @@ jobs:
 
   Mihomo-Linux-AMD64:
     needs: setup
-    uses: ./.github/workflows/mihomo-linux-amd64.yml
+    uses: ./.github/workflows/Mihomo-Linux-AMD64.yml
     with:
       VERSION: ${{ needs.setup.outputs.VERSION }}
 
   Mihomo-Linux-ARM64:
     needs: setup
-    uses: ./.github/workflows/mihomo-linux-arm64.yml
+    uses: ./.github/workflows/Mihomo-Linux-ARM64.yml
     with:
       VERSION: ${{ needs.setup.outputs.VERSION }}
 
   Mihomo-Windows-AMD64:
     needs: setup
-    uses: ./.github/workflows/mihomo-windows-amd64.yml
+    uses: ./.github/workflows/Mihomo-Windows-AMD64.yml
     with:
       VERSION: ${{ needs.setup.outputs.VERSION }}
 
   Mihomo-Windows-ARM64:
     needs: setup
-    uses: ./.github/workflows/mihomo-windows-arm64.yml
+    uses: ./.github/workflows/Mihomo-Windows-ARM64.yml
     with:
       VERSION: ${{ needs.setup.outputs.VERSION }}
 
   Mihomo-Metacubexd:
     needs: setup
-    uses: ./.github/workflows/mihomo-metacubexd.yml
+    uses: ./.github/workflows/Mihomo-Metacubexd.yml
     with:
       VERSION: ${{ needs.setup.outputs.VERSION }}
