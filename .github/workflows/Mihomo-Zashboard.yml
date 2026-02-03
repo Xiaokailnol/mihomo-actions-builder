@@ -61,6 +61,13 @@ jobs:
         pnpm run build
         zip -r zashboard-dist.zip dist
 
+    - name: Deploy to gh-pages-sarasa-only 🚀
+      uses: peaceiris/actions-gh-pages@v4
+      with:
+        github_token: ${{ secrets.PAT_TOKEN }}
+        publish_dir: ./dist
+        publish_branch: gh-pages
+          
     - name: Upload zashboard artifacts
       uses: actions/upload-artifact@v4
       with:
