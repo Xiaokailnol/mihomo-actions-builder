@@ -74,7 +74,7 @@ jobs:
     - name: Upload zashboard artifacts
       uses: actions/upload-artifact@v4
       with:
-        name: mihomo_metacubexd_${{ env.VERSION }}
+        name: mihomo_zashboard_${{ env.VERSION }}
         path: ${{ env.BUILD_DIR }}/zashboard/zashboard-dist.zip
 
     - name: Create zashboard release
