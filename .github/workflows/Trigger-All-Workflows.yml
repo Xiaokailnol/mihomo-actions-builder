@@ -108,7 +108,9 @@ jobs:
       ZASHBOARD_URL: https://gitea.kejizero.xyz/zhao/zashboard
       ZASHBOARD_BRANCH: master
       BUILD_DIR: /builder
-      
+    secrets:
+      PAT_TOKEN: ${{ secrets.PAT_TOKEN }}
+    
   sync_template:
     needs:
       - Mihomo-Linux-AMD64
