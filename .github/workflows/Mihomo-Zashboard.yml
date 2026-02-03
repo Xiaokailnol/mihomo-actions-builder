@@ -18,8 +18,8 @@ on:
         
 env:
   VERSION: ${{inputs.VERSION}}
-  METACUBEXD_URL: ${{inputs.ZASHBOARD_URL}}
-  METACUBEXD_BRANCH: ${{inputs.ZASHBOARD_BRANCH}}
+  ZASHBOARD_URL: ${{inputs.ZASHBOARD_URL}}
+  ZASHBOARD_BRANCH: ${{inputs.ZASHBOARD_BRANCH}}
   BUILD_DIR: ${{inputs.BUILD_DIR}}
   
 jobs:
