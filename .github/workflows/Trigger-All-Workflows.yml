@@ -99,17 +99,6 @@ jobs:
       METACUBEXD_URL: https://github.com/MetaCubeX/metacubexd
       METACUBEXD_BRANCH: main
       BUILD_DIR: /builder
-
-  Mihomo-Zashboard:
-    needs: setup
-    uses: ./.github/workflows/Mihomo-Zashboard.yml
-    with:
-      VERSION: ${{ needs.setup.outputs.VERSION }}
-      ZASHBOARD_URL: https://gitea.kejizero.xyz/zhao/zashboard
-      ZASHBOARD_BRANCH: master
-      BUILD_DIR: /builder
-    secrets:
-      PAT_TOKEN: ${{ secrets.PAT_TOKEN }}
     
   sync_template:
     needs:
@@ -120,7 +109,6 @@ jobs:
       - Mihomo-Android-AMD64
       - Mihomo-Android-ARM64
       - Mihomo-Metacubexd
-      - Mihomo-Zashboard
     runs-on: ubuntu-latest
     steps:
     - name: Checkout
